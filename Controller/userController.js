@@ -1,5 +1,7 @@
 const User = require("../model/user");
 const cron = require("node-cron");
+const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
 const updateDb = async (id) => {
   const names = [
@@ -45,9 +47,25 @@ const update = async (req, res) => {
   }
 };
 
+const sendEmail = async () => {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+  const msg = {
+    to: "prasishshrestha000999@gmail.com",
+    from: "prasishshrestha0099@gmail.com",
+    subject: "Sending with SendGrid is Fun",
+    text: "and easy to do anywhere, even with Node.js",
+    html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+  };
+
+  const info = await sgMail.send(msg);
+  console.log(info);
+};
+
 const automaticUpdate = (id) => {
   cron.schedule("10,30,50 * * * * *", () => {
     updateDb(id);
+    sendEmail();
     console.log("database updated");
   });
 };
